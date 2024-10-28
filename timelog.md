@@ -41,5 +41,5 @@
 ## Week 6
 
 ### 28 Oct 2022
-* *0.5 hours*: Supervisor Meeting
 * *3 hours* More research into temporal reasoning mechanisms for LLM agents
+* * *0.5 hours*: Supervisor Meeting
