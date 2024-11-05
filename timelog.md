@@ -43,3 +43,16 @@
 ### 28 Oct 2022
 * *3 hours* More research into temporal reasoning mechanisms for LLM agents
 * * *0.5 hours*: Supervisor Meeting
+
+### 01 Nov 2024
+* *3 hours* Setup basic conversational tool on autogen using llama 3.2 OOS LLM
+
+### 03 Nov 2024
+* *1 hour* Continued work on autogen tool
+
+## Week 7
+
+### 04 Nov 2024
+* *1 hour* Continued work on autogen tool
+* *2 hours* Lit review around conversational datasets and evaluation methods
+* *0.5 hours* Supervisor Meeting
