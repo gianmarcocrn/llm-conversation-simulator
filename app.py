@@ -1,23 +1,38 @@
 import autogen
 
-MAX_TURNS = 2
-
-class TurnLimitManager:
-    def __init__(self, max_turns):
-        self.turns = 0
-        self.max_turns = max_turns
-
-    def is_termination(self, msg):
-        self.turns += 1
-        return self.turns > self.max_turns
-
-turn_limit_manager = TurnLimitManager(MAX_TURNS * 2)
+TURNS_PER_AGENT = 2
+MODEL_NAME = "llama-3.2-3b-instruct"
 
 llm_config = {"config_list": [{
-    "model": "llama-3.2-3b-instruct",
+    "model": MODEL_NAME,
     "api_key": "not-needed",
     "base_url": "http://localhost:1234/v1"
 }]}
+
+class TurnLimitManager:
+    def __init__(self, max_turns, user_proxy: autogen.UserProxyAgent):
+        self.turns = 0
+        self.max_turns = max_turns
+        self.user_proxy = user_proxy
+
+    def is_termination_agents(self, msg):
+        self.turns += 1
+        self.user_proxy._is_termination_msg = self.is_termination_proxy
+        if self.turns >= (self.max_turns - 2):
+            print("FINAL TURNS")
+            self.user_proxy._default_auto_reply = "Resolve any open conversation topics and then wrap up the conversation."
+        return self.turns > self.max_turns
+    
+    def is_termination_proxy(self, msg):
+        return self.turns >= self.max_turns
+
+user_proxy = autogen.UserProxyAgent(
+    name="user proxy",
+    code_execution_config={"use_docker": False},
+    human_input_mode="NEVER",
+)
+
+turn_limit_manager = TurnLimitManager(TURNS_PER_AGENT * 2, user_proxy)
 
 agent_1 = autogen.AssistantAgent(
     name="Katherine Caldwell",
@@ -28,12 +43,10 @@ agent_1 = autogen.AssistantAgent(
                     You are speaking with Professor Giovanni Moretti, an Italian historian who specializes in Italy’s nuanced experience during WWII.
 
                     In conversation:
-                        •	Speak confidently and assertively, focusing on military strategies, industrial achievements, and statistics.
-                        •	Defend your arguments with data and historical reports, maintaining a diplomatic tone.
-                        •	Occasionally emphasize themes of liberation, democracy, and American leadership
-
-                    After 4 exchanges (2 conversation turns each), summarize your position and say bye to Dr. Moretti.""",
-    is_termination_msg = turn_limit_manager.is_termination,
+                        •	Speak confidently and assertively, focusing on military strategies, industrial achievements, and statistics
+                        •	Defend your arguments with data and historical reports, maintaining a diplomatic tone
+                        •	Occasionally emphasize themes of liberation, democracy, and American leadership""",
+    is_termination_msg = turn_limit_manager.is_termination_agents,
     llm_config=llm_config
 )
 
@@ -46,23 +59,15 @@ agent_2 = autogen.AssistantAgent(
                     You are speaking with Dr. Katherine Caldwell, an American historian who specializes in the military and political strategies of WWII.
 
                     In conversation:
-                        •	Speak philosophically and reflectively, often referencing social and cultural impacts.
-                        •	Subtly challenge oversimplified narratives, particularly those centered on American dominance.
-                        •	Emphasize Italy’s resilience, the courage of the Resistance, and the complexities of living through the war
-                    
-                    After 4 exchanges (2 conversation turns each), summarize your position and say bye to Dr. Moretti.""",
-    is_termination_msg = turn_limit_manager.is_termination,
+                        •	Speak philosophically and reflectively, often referencing social and cultural impacts
+                        •	Subtly challenge oversimplified narratives, particularly those centered on American dominance
+                        •	Emphasize Italy’s resilience, the courage of the Resistance, and the complexities of living through the war.""",
+    is_termination_msg = turn_limit_manager.is_termination_agents,
     llm_config=llm_config
 )
 
-user_proxy = autogen.UserProxyAgent(
-    name="user proxy",
-    code_execution_config={"use_docker": False},
-    human_input_mode="NEVER"
-)
-
 conversation = autogen.GroupChat(
-    agents=[agent_1, agent_2],
+    agents=[user_proxy, agent_1, agent_2],
     speaker_selection_method="round_robin",
     messages=[]
 )
@@ -82,7 +87,7 @@ user_proxy.initiate_chat(
 
 history = next(iter(user_proxy.chat_messages.values()))
 
-f = open("loggggggg.txt", "w")
+f = open("log.txt", "w")
 
 for i in history:
    f.write(i['role'] + " " + i['name'] + "\n" + i['content'] + "\n-------------------------------------------------------------------------------------------------------\n")
