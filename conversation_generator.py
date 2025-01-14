@@ -1,37 +1,5 @@
 import autogen
-
-TURNS_PER_AGENT = 3
-MODEL_NAME = "llama-3.2-3b-instruct"
-LOG_FILE_NAME = "conversation_log.txt"
-
-class TurnLimitManager:
-    def __init__(self, max_turns, user_proxy: autogen.UserProxyAgent):
-        self.turns = 0
-        self.max_turns = max_turns
-        self.user_proxy = user_proxy
-
-    def _is_termination_by_proxy(self, msg):
-        return self.turns >= self.max_turns
-
-    def is_termination_by_agents(self, msg):
-        self.turns += 1
-        self.user_proxy._is_termination_msg = self._is_termination_by_proxy
-        if self.turns >= (self.max_turns - 2):
-            print("FINAL TURNS")
-            self.user_proxy._default_auto_reply = "Resolve any open conversation topics and then wrap up the conversation."
-        if (self.turns > self.max_turns): print("FINISHING CONVERSATION")
-        return self.turns > self.max_turns
-    
-class ConversationLogger:
-    def __init__(self, file_name, conversation_history):
-        self.file_name = file_name
-        self.conversation_history = conversation_history
-    
-    def write_log_file(self):
-        file = open(self.file_name, "w")
-        for i in self.conversation_history:
-            file.write(i['name'] + ": \n" + i['content'] + "\n\n-----------------------------------------------------------------------------------------------------------------------\n\n")
-        file.close()
+from turn_limit_manager import TurnLimitManager
 
 class ConversationGenerator:
     def __init__(self, model_name, turns_per_agent) -> None:
@@ -107,9 +75,3 @@ class ConversationGenerator:
     
     def generate_conversation_history(self):
         return next(iter(self.user_proxy.chat_messages.values()))
-    
-if __name__ == "__main__":
-    conversation_generator = ConversationGenerator(MODEL_NAME, TURNS_PER_AGENT)
-    conversation_generator.initiate_conversation()
-    conversation_logger = ConversationLogger(LOG_FILE_NAME, conversation_generator.generate_conversation_history())
-    conversation_logger.write_log_file()
