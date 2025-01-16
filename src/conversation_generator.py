@@ -1,3 +1,4 @@
+import sys
 import autogen
 from turn_limit_manager import TurnLimitManager
 
@@ -55,7 +56,8 @@ class ConversationGenerator:
         conversation = autogen.GroupChat(
             agents=[self.user_proxy, agent_1, agent_2],
             speaker_selection_method="round_robin",
-            messages=[]
+            messages=[],
+            max_round = sys.maxsize
         )
 
         self.manager = autogen.GroupChatManager(

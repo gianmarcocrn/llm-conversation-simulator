@@ -1,6 +1,5 @@
 import os
 
-
 class ConversationLogger:
     def __init__(self, file_name, conversation_history):
         self.file_name = file_name
