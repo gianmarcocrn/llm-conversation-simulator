@@ -1,8 +1,10 @@
 import argparse
+from datetime import datetime
 
 from conversation_logger import ConversationLogger
 from conversation_generator import ConversationGenerator
 from llm_judge_evaluator import run_evaluation
+from utils import save_text_to_file_with_unique_name
 from config import TURNS_PER_AGENT, LOG_FILE_NAME, IS_AUTOMATIC_PERSONA_GENERATION, RUN_EVALUATION, PRIMARY_PERSONA_CHARACTERISTICS, SECONDARY_PERSONA_CHARACTERISTICS
 
 parser = argparse.ArgumentParser(description="Run a conversational data simulator with a specified LLM")
@@ -17,3 +19,8 @@ if __name__ == "__main__":
     if (RUN_EVALUATION):
         print("Running LLM-as-a-judge Evaluation...")
         run_evaluation(args.model_identifier, conversation_log_filename, conversation_generator.get_first_persona_setting())
+        run_evaluation(args.model_identifier, conversation_log_filename, conversation_generator.get_second_persona_setting())
+    else:
+        save_text_to_file_with_unique_name(conversation_generator.get_first_persona_setting(), "persona_1", "personas")
+        save_text_to_file_with_unique_name(conversation_generator.get_second_persona_setting(), "persona_2", "personas")
+        

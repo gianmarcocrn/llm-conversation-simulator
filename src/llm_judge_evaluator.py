@@ -1,6 +1,6 @@
 from datetime import datetime
 import os
-from utils import prompt_llm_for_response
+from utils import prompt_llm_for_response, save_text_to_file_with_unique_name
 
 # definitions from literature
 metric_to_explanation_mapping = {
@@ -106,7 +106,4 @@ def run_evaluation(model_name, conversation_log_filename, agent_persona):
 
     evaluation_result = prompt_llm_for_response(model_name, evaluation_prompt)
 
-    current_datetime_string = datetime.now().strftime("%d-%m-%Y_%H:%M:%S")
-
-    with open(f"eval_output_{current_datetime_string}.txt", "w") as file:
-        file.write(evaluation_result)
+    save_text_to_file_with_unique_name(evaluation_result, "eval_output", "evaluation_logs")
