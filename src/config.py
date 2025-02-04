@@ -1,5 +1,5 @@
 TURNS_PER_AGENT = 3
-MODEL_NAME = "llama-3.2-3b-instruct"
+RUN_EVALUATION = True
 LOG_FILE_NAME = "conversation_log_new_personas"
 CONVERSATION_PROMPT = """The focus of the conversation is to analyze the military, political, and cultural significance of key events during WW2. 
                         Start your discussion by addressing this question:
@@ -19,7 +19,7 @@ SECONDARY_PERSONA_CHARACTERISTICS = {"name": "Giovanni Moretti",
                                      "age": "65 years old",
                                      "gender": "male",
                                      "nationality": "Italian",
-                                     "language": "Italian but mostly fluent in English",
+                                     "language": "Italian is your native language, but this conversation will be in English. Your English is good but not overly fluent",
                                      "career_information": "a distinguished Italian historian and cultural theorist specializing in Southern Europe’s WWII experience. Educated at the University of Bologna and the Sorbonne. Your research focuses on Italy’s complex role during the war, from its alliance with the Axis to its later co-belligerence with the Allies",
                                      "mbti_personality": "ENFP",
                                      "values": "Patriotism, a cultural bias rooted in Italian perspectives, often critical of simplistic “Good vs. Evil” narratives. You believe human stories and cultural dimensions are just as important as military strategies.",

@@ -1,7 +1,7 @@
 import sys
 import autogen
 from turn_limit_manager import TurnLimitManager
-from persona_generation import generate_persona_prompt_from_demographics, generate_primary_persona, generate_secondary_persona, get_enriched_persona_prompt
+from persona_generation import convert_persona_demographic_dict_to_string, generate_persona_prompt_from_demographics, generate_primary_persona, generate_secondary_persona, get_enriched_persona_prompt
 from config import PRIMARY_PERSONA_CHARACTERISTICS, SECONDARY_PERSONA_CHARACTERISTICS, CONVERSATION_PROMPT, PERSONA_GENERATION_SCENARIO
 
 class ConversationGenerator:
@@ -11,9 +11,16 @@ class ConversationGenerator:
             "api_key": "not-needed",
             "base_url": "http://localhost:1234/v1"
         }]}
+        self.model_name = model_name
         self.turns_per_agent = turns_per_agent
         self.is_automatic_persona_generation = is_automatic_persona_generation
         self._agent_setup()
+    
+    def get_first_persona_setting(self):
+        return self.first_persona_setting
+
+    def get_second_persona_setting(self):
+        return self.second_persona_setting
 
     def _agent_setup(self):
         self.user_proxy = autogen.UserProxyAgent(
@@ -27,11 +34,15 @@ class ConversationGenerator:
         
         if (self.is_automatic_persona_generation):
             print("Generating Persona Prompts...")
-            first_persona_prompt = get_enriched_persona_prompt(generate_primary_persona(self.llm_config, PERSONA_GENERATION_SCENARIO))
-            second_persona_prompt = get_enriched_persona_prompt(generate_secondary_persona(self.llm_config, PERSONA_GENERATION_SCENARIO, first_persona_prompt))
+            self.first_persona_setting = generate_primary_persona(self.model_name, PERSONA_GENERATION_SCENARIO)
+            first_persona_prompt = get_enriched_persona_prompt(self.first_persona_setting, name="Agent 1")
+            self.second_persona_setting = generate_secondary_persona(self.model_name, PERSONA_GENERATION_SCENARIO, first_persona_prompt)
+            second_persona_prompt = get_enriched_persona_prompt(self.second_persona_setting, name="Agent 2")
         else:
             first_persona_prompt = generate_persona_prompt_from_demographics(PRIMARY_PERSONA_CHARACTERISTICS)
             second_persona_prompt = generate_persona_prompt_from_demographics(SECONDARY_PERSONA_CHARACTERISTICS)
+            self.first_persona_setting = convert_persona_demographic_dict_to_string(PRIMARY_PERSONA_CHARACTERISTICS)
+            self.second_persona_setting = convert_persona_demographic_dict_to_string(SECONDARY_PERSONA_CHARACTERISTICS)
 
         print(f"First persona prompt:\n{first_persona_prompt}")
         print(f"Second persona prompt:\n{second_persona_prompt}")

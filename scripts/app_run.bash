@@ -14,7 +14,7 @@ CONTEXT_LENGTH=$2
 lms server start
 lms load $MODEL --context-length=$CONTEXT_LENGTH
 
-python ./src/main.py
+python ./src/main.py $MODEL
 
 lms unload --all
 lms server stop
