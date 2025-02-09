@@ -35,17 +35,16 @@ class ConversationGenerator:
         if (self.is_automatic_persona_generation):
             print("Generating Persona Prompts...")
             self.first_persona_setting = generate_primary_persona(self.model_name, PERSONA_GENERATION_SCENARIO)
+            print(f"First persona setting:\n{self.first_persona_setting}")
             first_persona_prompt = get_enriched_persona_prompt(self.first_persona_setting, name="Agent 1")
             self.second_persona_setting = generate_secondary_persona(self.model_name, PERSONA_GENERATION_SCENARIO, first_persona_prompt)
+            print(f"Second persona setting:\n{self.second_persona_setting}")
             second_persona_prompt = get_enriched_persona_prompt(self.second_persona_setting, name="Agent 2")
         else:
             first_persona_prompt = generate_persona_prompt_from_demographics(PRIMARY_PERSONA_CHARACTERISTICS)
             second_persona_prompt = generate_persona_prompt_from_demographics(SECONDARY_PERSONA_CHARACTERISTICS)
             self.first_persona_setting = convert_persona_demographic_dict_to_string(PRIMARY_PERSONA_CHARACTERISTICS)
             self.second_persona_setting = convert_persona_demographic_dict_to_string(SECONDARY_PERSONA_CHARACTERISTICS)
-
-        print(f"First persona prompt:\n{first_persona_prompt}")
-        print(f"Second persona prompt:\n{second_persona_prompt}")
 
         agent_1 = autogen.AssistantAgent(
             name="Agent 1",
