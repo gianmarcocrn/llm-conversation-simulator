@@ -70,7 +70,7 @@ def construct_evaluation_prompt(conversation_history, agent_prompt):
         Conversation history:
         {conversation_history}
 
-        Now rate the performance of only the specified agent following the metrics and categories above.
+        Now rate the performance of only the agent whose persona is specified above following the metrics and categories above.
         Your output must strictly be in json format adhering to the format provided below, only filling in the blanks for the rating and explanation keys based on your evaluation.
         The explanation should be brief and it should refer to specific aspects of the conversation that made you choose that particular categorical rating.
         
