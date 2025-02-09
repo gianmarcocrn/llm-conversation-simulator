@@ -16,7 +16,7 @@ class TurnLimitManager:
         self.user_proxy._is_termination_msg = self._is_termination_by_proxy
         print(f"Turns so far: {self.turns}, Max turns: {self.max_turns}")
         if self.turns >= (self.max_turns - 2):
-            self.user_proxy._default_auto_reply = "Resolve any open conversation topics and then wrap up the conversation."
+            self.user_proxy._default_auto_reply = "Resolve any open conversation topics and do not introduce new ones. Then wrap up the conversation."
         print("is_termination_by_agent evaluates to: " + str(self.turns > self.max_turns))
         if (self.turns > self.max_turns): print("CONVERSATION FINISHED")
         return self.turns > self.max_turns
