@@ -14,11 +14,11 @@ def _generate_persona_prompt_from_scenario(scenario):
             - Nationality:
             - Language:
             - Career Info: 
-            - MBTI personality type:
+            - MBTI personality type (inlcuding brief description):
             - Values and Hobbies:  
             - Current Scenario Description: "
 
-            You are only providing the persona settings for a future conversation between the specified personas.
+            You are only providing the persona settings for a single persona.
             You must not output any other text other than the filled out persona setting.
         """
 
@@ -100,4 +100,3 @@ def get_enriched_persona_prompt(persona_setting, name):
             In conversation, prioritise unpacking topics that have already been introduced but not yet discussed. If conversation topics have exhausted, introduce new ones related to the previously discussed topics. Avoid repetition and stay relevant to your persona and to the conversation topics.
             Now, without saying anything unnecessary, immediately step into your role!
         """
-
