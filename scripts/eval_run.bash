@@ -14,7 +14,7 @@ CONVERSATION_FILE_NAME=$3
 PERSONA_FILE_NAME=$4
 
 lms server start
-lms load $MODEL --context-length=$CONTEXT_LENGTH
+lms load $MODEL --context-length=$CONTEXT_LENGTH --gpu=1.0
 
 python ./src/eval_main.py $MODEL $CONVERSATION_FILE_NAME $PERSONA_FILE_NAME
 

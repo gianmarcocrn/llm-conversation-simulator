@@ -12,7 +12,7 @@ MODEL=$1
 CONTEXT_LENGTH=$2
 
 lms server start
-lms load $MODEL --context-length=$CONTEXT_LENGTH
+lms load $MODEL --context-length=$CONTEXT_LENGTH --gpu=1.0
 
 python ./src/main.py $MODEL
 
