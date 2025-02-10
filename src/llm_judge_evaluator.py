@@ -1,6 +1,6 @@
 from datetime import datetime
 import os
-from utils import prompt_llm_for_response, save_text_to_file_with_unique_name
+from utils import prompt_llm_for_structured_response, save_text_to_file_with_unique_name
 
 # definitions from literature
 metric_to_explanation_mapping = {
@@ -34,6 +34,51 @@ metric_to_categories_mapping = {
         "Mostly Fluent": "The response is generally well-structured with only minor grammatical or syntactic issues.",
         "Somewhat Fluent": "The response has several grammatical errors, awkward phrasing, or structural issues.",
         "Not Fluent": "The response is difficult to understand due to poor grammar, broken syntax, or incoherent phrasing."
+    }
+}
+
+categorical_evaluation_schema = {
+    "type": "json_schema",
+    "json_schema": {
+        "name": "conversation_evaluation",
+        "schema": {
+            "type": "object",
+            "properties": {
+                "consistency": {
+                    "type": "object",
+                    "properties": {
+                        "rating": {"type": "string"},
+                        "explanation": {"type": "string"}
+                    },
+                    "required": ["rating", "explanation"]
+                },
+                "relevance": {
+                    "type": "object",
+                    "properties": {
+                        "rating": {"type": "string"},
+                        "explanation": {"type": "string"}
+                    },
+                    "required": ["rating", "explanation"]
+                },
+                "naturalness": {
+                    "type": "object",
+                    "properties": {
+                        "rating": {"type": "string"},
+                        "explanation": {"type": "string"}
+                    },
+                    "required": ["rating", "explanation"]
+                },
+                "fluency": {
+                    "type": "object",
+                    "properties": {
+                        "rating": {"type": "string"},
+                        "explanation": {"type": "string"}
+                    },
+                    "required": ["rating", "explanation"]
+                }
+            },
+            "required": ["consistency", "relevance", "naturalness", "fluency"]
+        }
     }
 }
 
@@ -71,29 +116,8 @@ def construct_evaluation_prompt(conversation_history, agent_prompt):
         {conversation_history}
 
         Now rate the performance of only the agent whose persona is specified above following the metrics and categories above.
-        Your output must strictly be in json format adhering to the format provided below, only filling in the blanks for the rating and explanation keys based on your evaluation.
-        The explanation should be brief and it should refer to specific aspects of the conversation that made you choose that particular categorical rating.
+        You should include a brief explanation for each chosen category which should refer to specific aspects of the conversation that influenced your choice.
         
-        JSON format:
-        {{
-            "consistency": {{
-                "rating": "",
-                "explanation": ""
-            }},
-            "relevance": {{
-                "rating": "",
-                "explanation": ""
-            }},
-            "naturalness": {{
-                "rating": "",
-                "explanation": ""
-            }},
-            "fluency": {{
-                "rating": "",
-                "explanation": ""
-            }}
-        }}
-        Your output must ONLY consist of the above format filled out with your evaluation ratings and explanations for each metric. Do not output any other information.
         Now perform your evaluation.       
         """
 
@@ -104,6 +128,6 @@ def run_evaluation(model_name, conversation_log_filename, agent_persona):
     
     evaluation_prompt = construct_evaluation_prompt(conversation_log_text, agent_persona)
 
-    evaluation_result = prompt_llm_for_response(model_name, evaluation_prompt)
+    evaluation_result = prompt_llm_for_structured_response(model_name, categorical_evaluation_schema, evaluation_prompt)
 
     save_text_to_file_with_unique_name(evaluation_result, "eval_output", "evaluation_logs")

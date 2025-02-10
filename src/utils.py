@@ -5,7 +5,23 @@ def prompt_llm_for_response(model_name, prompt):
     payload = {
             "model": model_name,
             "messages": [{"role": "user", "content": prompt}]
-            
+        }
+
+    response = requests.post(f"http://localhost:1234/v1/chat/completions", json=payload)
+
+    if response.status_code == 200:
+        data = response.json()
+        response_text = data.get("choices", [{}])[0].get("message", "Error").get("content", "No response")
+    else:
+        print(f"Error: {response.status_code} - {response.text}")
+        return
+    return response_text
+
+def prompt_llm_for_structured_response(model_name, json_schema, prompt):
+    payload = {
+            "model": model_name,
+            "messages": [{"role": "user", "content": prompt}],
+            "response_format": json_schema
         }
 
     response = requests.post(f"http://localhost:1234/v1/chat/completions", json=payload)
@@ -25,3 +41,4 @@ def save_text_to_file_with_unique_name(text, file_name, directory_name):
     os.makedirs(directory_name, exist_ok=True)
     with open(file_path, "w") as file:
         file.write(text)
+        

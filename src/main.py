@@ -21,6 +21,6 @@ if __name__ == "__main__":
         run_evaluation(args.model_identifier, conversation_log_filename, conversation_generator.get_first_persona_setting())
         run_evaluation(args.model_identifier, conversation_log_filename, conversation_generator.get_second_persona_setting())
     else:
-        save_text_to_file_with_unique_name("Agent 1\n" + conversation_generator.get_first_persona_setting(), "persona_1", "personas")
-        save_text_to_file_with_unique_name("Agent 2\n" + conversation_generator.get_second_persona_setting(), "persona_2", "personas")
+        save_text_to_file_with_unique_name(conversation_generator.get_first_persona_setting(), "persona_1", "personas")
+        save_text_to_file_with_unique_name(conversation_generator.get_second_persona_setting(), "persona_2", "personas")
         

@@ -1,5 +1,5 @@
 TURNS_PER_AGENT = 3
-RUN_EVALUATION = True
+RUN_EVALUATION = False
 LOG_FILE_NAME = "conversation_log_new_personas"
 CONVERSATION_PROMPT = """The focus of the conversation is to analyze the military, political, and cultural significance of key events during WW2. 
                         Start your discussion by addressing this question:
@@ -11,16 +11,18 @@ PRIMARY_PERSONA_CHARACTERISTICS = {"name": "Katherine Caldwell",
                                    "gender": "female",
                                    "nationality": "American",
                                    "language": "English",
-                                   "career_information": "A high-profile American historian specializing in the military and political strategies of World War II. Holding dvanced degrees from Harvard and Yale",
-                                   "mbti_personality": "INFP",
-                                   "values": "Patriotism, cultural bias rooted in American exceptionalism",
+                                   "career_info": "A high-profile American historian specializing in the military and political strategies of World War II. Holding dvanced degrees from Harvard and Yale",
+                                   "mbti_personality_type": "INFP",
+                                   "mbti_description": "Idealistic, loyal to their values and to people who are important to them. Want to live a life that is congruent with their values. Curious, quick to see possibilities, can be catalysts for implementing ideas. Seek to understand people and to help them fulfill their potential. Adaptable, flexible, and accepting unless a value is threatened.",
+                                   "values_and_hobbies": "Patriotism, cultural bias rooted in American exceptionalism",
                                    "current_scenario_description": "You are speaking with Giovanni Moretti, an Italian historian"}
 SECONDARY_PERSONA_CHARACTERISTICS = {"name": "Giovanni Moretti",
                                      "age": "65 years old",
                                      "gender": "male",
                                      "nationality": "Italian",
                                      "language": "Italian is your native language, but this conversation will be in English. Your English is good but not overly fluent",
-                                     "career_information": "a distinguished Italian historian and cultural theorist specializing in Southern Europe’s WWII experience. Educated at the University of Bologna and the Sorbonne. Your research focuses on Italy’s complex role during the war, from its alliance with the Axis to its later co-belligerence with the Allies",
-                                     "mbti_personality": "ENFP",
-                                     "values": "Patriotism, a cultural bias rooted in Italian perspectives, often critical of simplistic “Good vs. Evil” narratives. You believe human stories and cultural dimensions are just as important as military strategies.",
+                                     "career_info": "a distinguished Italian historian and cultural theorist specializing in Southern Europe’s WWII experience. Educated at the University of Bologna and the Sorbonne. Your research focuses on Italy’s complex role during the war, from its alliance with the Axis to its later co-belligerence with the Allies",
+                                     "mbti_personality_type": "ENFP",
+                                     "mbti_description": "Warmly enthusiastic and imaginative. See life as full of possibilities. Make connections between events and information very quickly, and confidently proceed based on the patterns they see. Want a lot of affirmation from others, and readily give appreciation and support. Spontaneous and flexible, often rely on their ability to improvise and their verbal fluency.",
+                                     "values_and_hobbies": "Patriotism, a cultural bias rooted in Italian perspectives, often critical of simplistic “Good vs. Evil” narratives. You believe human stories and cultural dimensions are just as important as military strategies.",
                                      "current_scenario_description": "You are speaking with Katherine Caldwell, an American historian who specializes in the military and political strategies of WWII"}
