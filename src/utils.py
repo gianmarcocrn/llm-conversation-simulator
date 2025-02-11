@@ -1,4 +1,4 @@
-import requests, os
+import requests, os, csv, random
 from datetime import datetime
 
 def prompt_llm_for_response(model_name, prompt):
@@ -41,4 +41,12 @@ def save_text_to_file_with_unique_name(text, file_name, directory_name):
     os.makedirs(directory_name, exist_ok=True)
     with open(file_path, "w") as file:
         file.write(text)
-        
+
+def generate_random_debate_topic():
+    with open('data/IBMDebatingTopicDataset.csv', newline='') as f:
+        reader = csv.reader(f)
+        data = [row[0] for row in reader]
+    return random.choice(data)
+
+def make_conversation_prompt_from_topic(topic):
+    return f"The focus of the conversation is to debate your opinions around the following topic: {topic}"

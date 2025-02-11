@@ -1,10 +1,6 @@
-TURNS_PER_AGENT = 3
-RUN_EVALUATION = False
-LOG_FILE_NAME = "conversation_log_new_personas"
-CONVERSATION_PROMPT = """The focus of the conversation is to analyze the military, political, and cultural significance of key events during WW2. 
-                        Start your discussion by addressing this question:
-                        “Which event do you consider the most pivotal in determining the outcome of World War II, and why?”"""
-PERSONA_GENERATION_SCENARIO = "A conversation is taking place between two high profile historians about the pivotal moments of WWII."
+CONVERSATION_LOG_FILE_NAME = "conversation_log_new_personas"
+RUN_EVALUATION_ON_SAME_MODEL_AS_GENERATION = False # Advised to keep as False to avoid model bias in evaluation
+
 IS_AUTOMATIC_PERSONA_GENERATION = True # If False, below persona characteristics are used
 PRIMARY_PERSONA_CHARACTERISTICS = {"name": "Katherine Caldwell",
                                    "age": "46 years old",
@@ -26,3 +22,14 @@ SECONDARY_PERSONA_CHARACTERISTICS = {"name": "Giovanni Moretti",
                                      "mbti_description": "Warmly enthusiastic and imaginative. See life as full of possibilities. Make connections between events and information very quickly, and confidently proceed based on the patterns they see. Want a lot of affirmation from others, and readily give appreciation and support. Spontaneous and flexible, often rely on their ability to improvise and their verbal fluency.",
                                      "values_and_hobbies": "Patriotism, a cultural bias rooted in Italian perspectives, often critical of simplistic “Good vs. Evil” narratives. You believe human stories and cultural dimensions are just as important as military strategies.",
                                      "current_scenario_description": "You are speaking with Katherine Caldwell, an American historian who specializes in the military and political strategies of WWII"}
+
+IS_RANDOM_CONVERSATION_TOPIC = True # If False, below conversation prompt and persona generation scenario are used
+CONVERSATION_PROMPT = """The focus of the conversation is to analyze the military, political, and cultural significance of key events during WW2. 
+                        Start your discussion by addressing this question:
+                        “Which event do you consider the most pivotal in determining the outcome of World War II, and why?”"""
+PERSONA_GENERATION_SCENARIO = "A conversation is taking place between two high profile historians about the pivotal moments of WWII."
+
+IS_VARIABLE_NUMBER_OF_TURNS = True # If False, below fixed number of turns is used. if True, a random number of turns between the specified minimum and maximum numbers is chosen
+FIXED_TURNS_PER_AGENT = 3
+MINIMUM_TURNS_PER_AGENT = 3
+MAXIMUM_TURNS_PER_AGENT = 6

@@ -3,11 +3,12 @@ import autogen
 import json
 
 from turn_limit_manager import TurnLimitManager
-from persona_generation import convert_persona_demographic_dict_to_string, generate_persona_prompt_from_demographics, generate_primary_persona, generate_secondary_persona
+from persona_generation import convert_persona_demographic_dict_to_string, generate_persona_prompt_from_demographics, generate_primary_persona, generate_secondary_persona, make_persona_generation_scenario_from_topic
+from utils import generate_random_debate_topic, make_conversation_prompt_from_topic
 from config import PRIMARY_PERSONA_CHARACTERISTICS, SECONDARY_PERSONA_CHARACTERISTICS, CONVERSATION_PROMPT, PERSONA_GENERATION_SCENARIO
 
 class ConversationGenerator:
-    def __init__(self, model_name, turns_per_agent, is_automatic_persona_generation) -> None:
+    def __init__(self, model_name, turns_per_agent, is_automatic_persona_generation, is_random_conversation_topic) -> None:
         self.llm_config = {"config_list": [{
             "model": model_name,
             "api_key": "not-needed",
@@ -16,6 +17,7 @@ class ConversationGenerator:
         self.model_name = model_name
         self.turns_per_agent = turns_per_agent
         self.is_automatic_persona_generation = is_automatic_persona_generation
+        self.is_random_conversation_topic = is_random_conversation_topic
         self._agent_setup()
     
     def get_first_persona_setting(self):
@@ -34,14 +36,21 @@ class ConversationGenerator:
 
         turn_limit_manager = TurnLimitManager(self.turns_per_agent * 2, self.user_proxy)
 
+        if (self.is_random_conversation_topic):
+            self.conversation_scenario = generate_random_debate_topic()
+            print(f"Conversation topic: {self.conversation_scenario}")
+            persona_generation_scenario = make_persona_generation_scenario_from_topic(self.conversation_scenario)
+        else:
+            persona_generation_scenario = PERSONA_GENERATION_SCENARIO
+        
         if (self.is_automatic_persona_generation):
             print("Generating Persona Prompts...")
 
-        first_persona_characteristics = json.loads(generate_primary_persona(self.model_name, PERSONA_GENERATION_SCENARIO)).get("persona_setting") if self.is_automatic_persona_generation else PRIMARY_PERSONA_CHARACTERISTICS
+        first_persona_characteristics = json.loads(generate_primary_persona(self.model_name, persona_generation_scenario)).get("persona_setting") if self.is_automatic_persona_generation else PRIMARY_PERSONA_CHARACTERISTICS
         print(f"First persona setting dictionary:\n{first_persona_characteristics}")
         self.first_persona_setting = convert_persona_demographic_dict_to_string(first_persona_characteristics)
 
-        second_persona_characteristics = json.loads(generate_secondary_persona(self.model_name, PERSONA_GENERATION_SCENARIO, self.first_persona_setting)).get("persona_setting") if self.is_automatic_persona_generation else SECONDARY_PERSONA_CHARACTERISTICS
+        second_persona_characteristics = json.loads(generate_secondary_persona(self.model_name, persona_generation_scenario, self.first_persona_setting)).get("persona_setting") if self.is_automatic_persona_generation else SECONDARY_PERSONA_CHARACTERISTICS
         print(f"Second persona setting:\n{second_persona_characteristics}")
         self.second_persona_setting = convert_persona_demographic_dict_to_string(second_persona_characteristics)
 
@@ -75,11 +84,10 @@ class ConversationGenerator:
             llm_config=self.llm_config
         )
 
-
     def initiate_conversation(self):
         self.user_proxy.initiate_chat(
             self.manager,
-            message = CONVERSATION_PROMPT,
+            message = make_conversation_prompt_from_topic(self.conversation_scenario) if (self.is_random_conversation_topic) else CONVERSATION_PROMPT,
         )
     
     def generate_conversation_history(self):
