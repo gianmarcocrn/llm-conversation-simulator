@@ -4,36 +4,36 @@ from utils import prompt_llm_for_structured_response, save_text_to_file_with_uni
 
 # definitions from literature
 metric_to_explanation_mapping = {
-    "consistency": "Determine whether elements of a persona remain unchanged throughout the different turns in a conversation", # from building better AI agents Sun et al
-    "relevance": "Determine whether this response serves as a valid continuation of the previous conversation.", # or coherence?
+    "consistency": "Determine whether the specified persona is consistent with the exhibited conversation style and wether elements of the persona remain unchanged throughout the different turns in the conversation", # from building better AI agents Sun et al
+    "relevance": "Determine whether each conversation turn serves as a valid continuation of the previous conversation.", # or coherence?
     "naturalness": "Judge whether a response is like something a person would naturally say", #from towards a unified... zhong et al
-    "fluency": "Judge whether the conversation exhibits fluent language"
+    "fluency": "Judge whether the conversation exhibits fluent language in the language that is correct for the context"
 }
 
 metric_to_categories_mapping = {
     "consistency": {
-        "Highly Consistent": "The persona remains unchanged across all turns, maintaining personality traits, beliefs, and factual consistency.",
-        "Mostly Consistent": "Minor variations in persona but no major contradictions or shifts in personality or facts.",
-        "Somewhat Inconsistent": "Noticeable shifts in persona, tone, or factual stance, but still somewhat recognizable as the same entity.",
-        "Highly Inconsistent": "Frequent contradictions in persona, beliefs, or facts that indicate a loss of character identity."
+        "Highly Consistent": "The agent's conversation style is highly consistent with specified persona. The persona remains unchanged across all turns, maintaining personality traits, beliefs, and factual consistency.",
+        "Mostly Consistent": "The agent's conversation style is mostly consistent with specified persona. Minor variations in persona but no major contradictions or shifts in personality or facts.",
+        "Somewhat Inconsistent": "The agent's conversation style is somehwat inconsistent with specified persona. Noticeable shifts in persona, tone, or factual stance, but still somewhat recognizable as the same entity.",
+        "Highly Inconsistent": "The agent's conversation style is highly inconsistent with specified persona. Frequent contradictions in persona, beliefs, or facts that indicate a loss of character identity."
     },
     "relevance": {
-        "Highly Relevant": "The response directly addresses the previous turn and contributes meaningfully to the conversation.",
-        "Mostly Relevant": "The response is generally on-topic but may contain slight digressions or unnecessary details.",
-        "Somewhat Relevant": "Parts of the response are related, but significant portions are off-topic or loosely connected.",
-        "Irrelevant": "The response does not relate to the conversation context and introduces unrelated or nonsensical content."
+        "Highly Relevant": "The agent's responses directly address the previous turns and contribute meaningfully to the conversation.",
+        "Mostly Relevant": "The agent's responses are generally on-topic but may contain slight digressions or unnecessary details.",
+        "Somewhat Relevant": "Parts of the the agent's responses are related to the conversation, but significant portions are off-topic or loosely connected.",
+        "Irrelevant": "The agent's responses do not relate to the conversation context and introduce unrelated or nonsensical content."
     },
     "naturalness": {
-        "Highly Natural": "The response closely resembles human conversational patterns, with appropriate phrasing, tone, and fluidity.",
-        "Mostly Natural": "The response is mostly human-like but may contain slight awkwardness or unnatural phrasing.",
-        "Somewhat Unnatural": "The response has noticeable unnatural phrasing, forced structure, or robotic tendencies.",
-        "Highly Unnatural": "The response is clearly artificial, disjointed, or structured in a way that no human would typically express."
+        "Highly Natural": "The agent's responses closely resemble human conversational patterns, with appropriate phrasing, tone, and fluidity.",
+        "Mostly Natural": "The agent's responses are mostly human-like but may contain slight awkwardness or unnatural phrasing.",
+        "Somewhat Unnatural": "The agent's responses have noticeable unnatural phrasing, forced structure, or robotic tendencies.",
+        "Highly Unnatural": "The agent's responses are clearly artificial, disjointed, or structured in a way that no human would typically express."
     },
     "fluency": {
-        "Highly Fluent": "The response has perfect grammar, sentence structure, and word usage with no errors.",
-        "Mostly Fluent": "The response is generally well-structured with only minor grammatical or syntactic issues.",
-        "Somewhat Fluent": "The response has several grammatical errors, awkward phrasing, or structural issues.",
-        "Not Fluent": "The response is difficult to understand due to poor grammar, broken syntax, or incoherent phrasing."
+        "Highly Fluent": "The agent's responses have perfect grammar, sentence structure, and word usage with no errors.",
+        "Mostly Fluent": "The agent's responses are generally well-structured with only minor grammatical or syntactic issues.",
+        "Somewhat Fluent": "The agent's responses have several grammatical errors, awkward phrasing, or structural issues.",
+        "Not Fluent": "The agent's responses are difficult to understand due to poor grammar, broken syntax, or incoherent phrasing."
     }
 }
 
@@ -100,7 +100,7 @@ def construct_evaluation_prompt(conversation_history, agent_prompt):
         The following are the metrics that you will use together with their definition and the possible categories to use while evaluating on the given metric:
         - Consistency: {metric_to_explanation_mapping.get("consistency")}
         {format_categories("consistency")}
-        - Coherence: {metric_to_explanation_mapping.get("relevance")}
+        - Relevance: {metric_to_explanation_mapping.get("relevance")}
         {format_categories("relevance")}
         - Naturalness: {metric_to_explanation_mapping.get("naturalness")}
         {format_categories("naturalness")}
@@ -109,13 +109,14 @@ def construct_evaluation_prompt(conversation_history, agent_prompt):
 
         Read the agent persona and resulting conversation carefully.
 
-        Agent persona:
+        Agent persona (this should influence only your consistency rating):
         {agent_prompt}
         
         Conversation history:
         {conversation_history}
 
         Now rate the performance of only the agent whose persona is specified above following the metrics and categories above.
+        You should let the agent persona influence your consistency rating only, with the conversation history fully driving your judgement for the relevance, naturalness and fluency ratings.
         You should include a brief explanation for each chosen category which should refer to specific aspects of the conversation that influenced your choice.
         
         Now perform your evaluation.       
