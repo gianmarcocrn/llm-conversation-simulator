@@ -1,6 +1,7 @@
 from datetime import datetime
 import os
 from utils import prompt_llm_for_structured_response, save_text_to_file_with_unique_name
+from config import CONVERSATION_LOG_DIR_NAME, EVAL_RESULTS_DIR_NAME
 
 # definitions from literature
 metric_to_explanation_mapping = {
@@ -124,11 +125,11 @@ def construct_evaluation_prompt(conversation_history, agent_prompt):
 
 def run_evaluation(model_name, conversation_log_filename, agent_persona):
     
-    with open(os.path.join("logs", conversation_log_filename), "r", encoding="utf-8") as file:
+    with open(os.path.join(CONVERSATION_LOG_DIR_NAME, conversation_log_filename), "r", encoding="utf-8") as file:
         conversation_log_text = file.read()
     
     evaluation_prompt = construct_evaluation_prompt(conversation_log_text, agent_persona)
 
     evaluation_result = prompt_llm_for_structured_response(model_name, categorical_evaluation_schema, evaluation_prompt)
 
-    save_text_to_file_with_unique_name(evaluation_result, "eval_output", "evaluation_logs")
+    save_text_to_file_with_unique_name(evaluation_result, "eval_output", EVAL_RESULTS_DIR_NAME)
