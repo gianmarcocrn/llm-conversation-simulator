@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Check if the user provided model and context length as arguments
-if [ $# -lt 2 ]; then
+# Check if the user provided model, context length, conversation log filename and persona setting filename as arguments
+if [ $# -lt 4 ]; then
     echo "Error - Not enough arguments were given"
     echo "Usage: $0 <model> <context-length> <conversation-filename> <persona-file-name>"
     echo "Example: $0 mlx-community/Llama-3.2-3B-Instruct-4bit 50000 conversation.txt persona.txt"
