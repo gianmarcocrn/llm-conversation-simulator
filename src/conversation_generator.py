@@ -31,7 +31,7 @@ class ConversationGenerator:
             name="user proxy",
             code_execution_config={"use_docker": False},
             human_input_mode="NEVER",
-            default_auto_reply="Keep the conversation going. Prioritise unpacking topics that have already been introduced but not yet discussed. If conversation topics have exhausted, introduce new ones related to the previously discussed topics. Avoid repetition and stay relevant to your persona and to the conversation topics"
+            default_auto_reply="Keep the conversation going. Prioritise unpacking topics that have already been introduced but not yet discussed. If conversation topics have exhausted, introduce new ones related to the previously discussed topics. Avoid repetition, try to be concise, stay consistent with your persona and relevant to the conversation topics"
         )
 
         turn_limit_manager = TurnLimitManager(self.turns_per_agent * 2, self.user_proxy)

@@ -14,7 +14,13 @@ class ConversationLogger:
         file_path = os.path.join(CONVERSATION_LOG_DIR_NAME, dynamic_file_name)
         os.makedirs(CONVERSATION_LOG_DIR_NAME, exist_ok=True)
         file = open(file_path, "w")
-        for i in self.conversation_history:
-            file.write(i['name'] + ": \n" + i['content'] + "\n\n-----------------------------------------------------------------------------------------------------------------------\n\n")
+        conversation_turn_count = 0
+        for index,turn in enumerate(self.conversation_history):
+            if (turn['name'] == 'user proxy'):
+                if (index == 0):
+                    file.write("Conversation topic prompt: " + "'" + turn['content'] + "'" + "\n\n-------------------------------------------------------------------------------------------------------------------------------------\n\n")
+                continue
+            conversation_turn_count += 1
+            file.write(turn['name'] + " - Conversation turn " + str(conversation_turn_count) + ": \n" + "'" + turn['content']+ "'" + "\n\n-------------------------------------------------------------------------------------------------------------------------------------\n\n")
         file.close()
         return dynamic_file_name
