@@ -14,7 +14,7 @@ persona_generation_schema = {
                         "age": {"type": "integer"},
                         "gender": {"type": "string"},
                         "nationality": {"type": "string"},
-                        "language": {"type": "string"},
+                        "native_language": {"type": "string"},
                         "career_info": {"type": "string"},
                         "mbti_personality_type": {"type": "string"},
                         "mbti_description": {"type": "string"},
@@ -22,7 +22,7 @@ persona_generation_schema = {
                         "current_scenario_description": {"type": "string"}
                     },
                     "required": [
-                        "name", "age", "gender", "nationality", "language", 
+                        "name", "age", "gender", "nationality", "native_language", 
                         "career_info", "mbti_personality_type", "mbti_description", 
                         "values_and_hobbies", "current_scenario_description"
                     ]
@@ -58,7 +58,7 @@ def convert_persona_demographic_dict_to_string(persona_characteristics : dict):
     - Age: {persona_characteristics.get("age")} 
     - Gender: {persona_characteristics.get("gender")} 
     - Nationality: {persona_characteristics.get("nationality")} 
-    - Language: {persona_characteristics.get("language")}
+    - Native Language: {persona_characteristics.get("native_language")}
     - Career Info: {persona_characteristics.get("career_info")}
     - MBTI personality type: {persona_characteristics.get("mbti_personality_type")}
     - MBTI personality description: {persona_characteristics.get("mbti_description")}
@@ -75,7 +75,7 @@ def generate_persona_prompt_from_demographics(persona_characteristics : dict, ot
             - Age: {persona_characteristics.get("age")} 
             - Gender: {persona_characteristics.get("gender")} 
             - Nationality: {persona_characteristics.get("nationality")} 
-            - Language: {persona_characteristics.get("language")}
+            - Native Language: {persona_characteristics.get("native_language")}
             - Career Info: {persona_characteristics.get("career_info")}
             - MBTI personality type: {persona_characteristics.get("mbti_personality_type")}
             - MBTI personality description: {persona_characteristics.get("mbti_description")}
@@ -83,6 +83,7 @@ def generate_persona_prompt_from_demographics(persona_characteristics : dict, ot
             - Current Scenario Description: {persona_characteristics.get("current_scenario_description")}.
             The focus of your conversation with the other real human should be the chosen conversation topic. You don’t need to reiterate your persona or background when asking questions.
             Fully immerse yourself in the perspective of the persona described above.
+            You should express yourself talking in first person dialogue only.
             Your language and conversation style should reflect all of the user persona settings specified above, without explicitly mentioning any of them unless they become relevant in the conversation.
             In conversation, prioritise unpacking topics that have already been introduced but not yet discussed. If conversation topics have exhausted, introduce new ones related to the previously discussed topics. Avoid repetition and stay relevant to your persona and to the conversation topics.
             Keep each conversation turn as concise as possible without going against the personality assigned to you above.
