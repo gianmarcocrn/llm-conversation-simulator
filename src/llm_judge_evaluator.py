@@ -1,40 +1,40 @@
-from datetime import datetime
 import os
+
 from utils import prompt_llm_for_structured_response, save_text_to_file_with_unique_name
 from config import CONVERSATION_LOG_DIR_NAME, EVAL_RESULTS_DIR_NAME
 
 # definitions from literature
 metric_to_explanation_mapping = {
-    "consistency": "Determine whether the specified persona is consistent with the exhibited conversation style and wether elements of the persona remain unchanged throughout the different turns in the conversation", # from building better AI agents Sun et al
-    "relevance": "Determine whether each conversation turn serves as a valid continuation of the previous conversation.", # or coherence?
-    "naturalness": "Judge whether a response is like something a person would naturally say", #from towards a unified... zhong et al
-    "fluency": "Judge whether the conversation exhibits fluent language in the language that is correct for the context"
+    "consistency": "Determine whether the specified persona is consistent with the exhibited conversation style and content, and wether elements of the persona remain unchanged throughout the different turns in the conversation", # from building better AI agents Sun et al
+    "relevance": "Determine whether each conversation is relevant to the conversation topic and serves as a valid continuation of the previous conversation turns", # or coherence?
+    "naturalness": "Determine whether a response is like something a person would naturally say", #from towards a unified... zhong et al
+    "fluency": "Determine whether the conversation exhibits fluent language in the language that is correct for the context"
 }
 
 metric_to_categories_mapping = {
     "consistency": {
+        "Somewhat Inconsistent": "The agent's conversation style is somehwat inconsistent with specified persona. Noticeable shifts in persona, tone, or factual stance, but still somewhat recognizable as the same entity.",
+        "Highly Inconsistent": "The agent's conversation style is highly inconsistent with specified persona. Frequent contradictions in persona, beliefs, or facts that indicate a loss of character identity.",
         "Highly Consistent": "The agent's conversation style is highly consistent with specified persona. The persona remains unchanged across all turns, maintaining personality traits, beliefs, and factual consistency.",
         "Mostly Consistent": "The agent's conversation style is mostly consistent with specified persona. Minor variations in persona but no major contradictions or shifts in personality or facts.",
-        "Somewhat Inconsistent": "The agent's conversation style is somehwat inconsistent with specified persona. Noticeable shifts in persona, tone, or factual stance, but still somewhat recognizable as the same entity.",
-        "Highly Inconsistent": "The agent's conversation style is highly inconsistent with specified persona. Frequent contradictions in persona, beliefs, or facts that indicate a loss of character identity."
     },
     "relevance": {
+        "Somewhat Irrelevant": "Parts of the agent's responses are related to the conversation, but significant portions are off-topic or loosely connected.",
+        "Highly Irrelevant": "The agent's responses do not relate to the conversation context and introduce unrelated or nonsensical content.",
         "Highly Relevant": "The agent's responses directly address the previous turns and contribute meaningfully to the conversation.",
-        "Mostly Relevant": "The agent's responses are generally on-topic but may contain slight digressions or unnecessary details.",
-        "Somewhat Relevant": "Parts of the the agent's responses are related to the conversation, but significant portions are off-topic or loosely connected.",
-        "Irrelevant": "The agent's responses do not relate to the conversation context and introduce unrelated or nonsensical content."
+        "Mostly Relevant": "The agent's responses are generally on-topic but may contain slight digressions or unnecessary details.",  
     },
     "naturalness": {
+        "Somewhat Unnatural": "The agent's responses have noticeable unnatural phrasing, forced structure, or robotic tendencies.",
+        "Highly Unnatural": "The agent's responses are clearly artificial, disjointed, or structured in a way that no human would typically express.",
         "Highly Natural": "The agent's responses closely resemble human conversational patterns, with appropriate phrasing, tone, and fluidity.",
         "Mostly Natural": "The agent's responses are mostly human-like but may contain slight awkwardness or unnatural phrasing.",
-        "Somewhat Unnatural": "The agent's responses have noticeable unnatural phrasing, forced structure, or robotic tendencies.",
-        "Highly Unnatural": "The agent's responses are clearly artificial, disjointed, or structured in a way that no human would typically express."
     },
     "fluency": {
+        "Somewhat Fluent": "The agent's responses have several grammatical errors, awkward phrasing, or structural issues.",
+        "Not Fluent": "The agent's responses are difficult to understand due to poor grammar, broken syntax, or incoherent phrasing.",
         "Highly Fluent": "The agent's responses have perfect grammar, sentence structure, and word usage with no errors.",
         "Mostly Fluent": "The agent's responses are generally well-structured with only minor grammatical or syntactic issues.",
-        "Somewhat Fluent": "The agent's responses have several grammatical errors, awkward phrasing, or structural issues.",
-        "Not Fluent": "The agent's responses are difficult to understand due to poor grammar, broken syntax, or incoherent phrasing."
     }
 }
 
@@ -48,32 +48,32 @@ categorical_evaluation_schema = {
                 "consistency": {
                     "type": "object",
                     "properties": {
-                        "rating": {"type": "string"},
-                        "explanation": {"type": "string"}
+                        "explanation": {"type": "string", "minLength": 1},
+                        "rating": {"type": "string", "minLength": 1}
                     },
                     "required": ["rating", "explanation"]
                 },
                 "relevance": {
                     "type": "object",
                     "properties": {
-                        "rating": {"type": "string"},
-                        "explanation": {"type": "string"}
+                        "explanation": {"type": "string", "minLength": 1},
+                        "rating": {"type": "string", "minLength": 1}
                     },
                     "required": ["rating", "explanation"]
                 },
                 "naturalness": {
                     "type": "object",
                     "properties": {
-                        "rating": {"type": "string"},
-                        "explanation": {"type": "string"}
+                        "explanation": {"type": "string", "minLength": 1},
+                        "rating": {"type": "string", "minLength": 1}
                     },
                     "required": ["rating", "explanation"]
                 },
                 "fluency": {
                     "type": "object",
                     "properties": {
-                        "rating": {"type": "string"},
-                        "explanation": {"type": "string"}
+                        "explanation": {"type": "string", "minLength": 1},
+                        "rating": {"type": "string", "minLength": 1}
                     },
                     "required": ["rating", "explanation"]
                 }
@@ -92,36 +92,45 @@ def format_categories(metric):
 def construct_evaluation_prompt(conversation_history, agent_prompt):
 # based on g-eval, modified for current needs
     return f"""
-        You will be given a conversation log between two AI agents that were each given a persona specification to follow and a common conversation topic.
-        You will also be given the persona specification of one of the two agents.
-        Your task is to evaluate the conversational abilities of the agent whose persona you've been provided with on several metrics.
-        You are given the metrics that you should use below, alognside the possible categories that you can choose.
-        Please make sure you read and understand these instructions carefully. Please keep this document open while reviewing, and refer to it as needed.
+You will be given a conversation log between two AI agents. Each agent was assigned a persona specification and a common conversation topic to discuss.
+You will also be given the persona specification of one of the two agents.
+Your task is to evaluate the conversational abilities of the agent whose persona you've been provided with on several metrics.
+You are given the metrics that you should use below, alongside the possible rating categories that you can choose from.
+Please make sure you read and understand these instructions carefully.
+Please keep this document open while reviewing, and refer to it as needed.
 
-        The following are the metrics that you will use together with their definition and the possible categories to use while evaluating on the given metric:
-        - Consistency: {metric_to_explanation_mapping.get("consistency")}
-        {format_categories("consistency")}
-        - Relevance: {metric_to_explanation_mapping.get("relevance")}
-        {format_categories("relevance")}
-        - Naturalness: {metric_to_explanation_mapping.get("naturalness")}
-        {format_categories("naturalness")}
-        - Fluency: {metric_to_explanation_mapping.get("fluency")}
-        {format_categories("fluency")}
+Evaluation Criteria:
+The following are the metrics that you will use together with their definition and the possible categories to choose from while evaluating on the given metric:
+- Consistency: {metric_to_explanation_mapping.get("consistency")}
+{format_categories("consistency")}
+- Relevance: {metric_to_explanation_mapping.get("relevance")}
+{format_categories("relevance")}
+- Naturalness: {metric_to_explanation_mapping.get("naturalness")}
+{format_categories("naturalness")}
+- Fluency: {metric_to_explanation_mapping.get("fluency")}
+{format_categories("fluency")}
 
-        Read the agent persona and resulting conversation carefully.
+Evaluation steps:
+1. Read the agent's persona carefully (provided below).  
+2. Analyze the conversation history thoroughly (provided below) and take notes on relevant examples useful for your evaluation.
+3. For each metric, first write a brief but detailed justification explaining your rating. You must refer to specific points in the conversation that influenced your decision.  
+4. After justifying your reasoning, select the most appropriate rating from the provided categories.
+5. Be strict but fair. No rating is inherently more correct than the others. Do not assume the best rating unless strong evidence supports it.
 
-        Agent persona (this should influence only your consistency rating):
-        {agent_prompt}
-        
-        Conversation history:
-        {conversation_history}
+Additional guidelines:
+1. You should let the agent persona influence your consistency rating only, with the conversation history fully driving your judgement for the relevance, naturalness and fluency ratings.
+2. Each conversation turn is meant to be a first person dialogue from the specified agent. It is not normal or natural for the agent to simulate another multi-turn dialogue within a single conversation turn.
+3. You MUST choose from the provided list of ratings. Any rating that is not from the list of valid ratings will be invalid. 
 
-        Now rate the performance of only the agent whose persona is specified above following the metrics and categories above.
-        You should let the agent persona influence your consistency rating only, with the conversation history fully driving your judgement for the relevance, naturalness and fluency ratings.
-        You should include a brief explanation for each chosen category which should refer to specific aspects of the conversation that influenced your choice.
-        
-        Now perform your evaluation.       
-        """
+Agent persona:
+{agent_prompt}
+
+Conversation history:
+{conversation_history}
+
+--------------------------------------------------------------------
+
+Now rate the performance of only the agent whose persona is specified above following the guidance above."""
 
 def run_evaluation(model_name, conversation_log_filename, agent_persona):
     
