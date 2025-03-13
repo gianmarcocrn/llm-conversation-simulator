@@ -1,7 +1,8 @@
 import os
+import re
 
 from utils import prompt_llm_for_structured_response, save_text_to_file_with_unique_name
-from config import CONVERSATION_LOG_DIR_NAME, EVAL_RESULTS_DIR_NAME
+from config import CONVERSATION_LOG_DIR_NAME, EVAL_RESULTS_DIR_NAME, PERSONAS_LOG_DIR_NAME
 
 # definitions from literature
 metric_to_explanation_mapping = {
@@ -142,3 +143,36 @@ def run_evaluation(model_name, conversation_log_filename, agent_persona):
     evaluation_result = prompt_llm_for_structured_response(model_name, categorical_evaluation_schema, evaluation_prompt)
 
     save_text_to_file_with_unique_name(evaluation_result, "eval_output", EVAL_RESULTS_DIR_NAME)
+
+def extract_timestamp(filename):
+    match = re.search(r'(\d{2}-\d{2}-\d{4}_\d{2}:\d{2}:\d{2})', filename)
+    return match.group(1) if match else None
+
+def run_evaluation_from_file_names(model_name, conversation_log_filename, agent_persona_filename):
+
+    conversation_timestamp = extract_timestamp(conversation_log_filename)
+    persona_timestamp = extract_timestamp(agent_persona_filename)
+
+    if (conversation_timestamp != persona_timestamp):
+        print(f"Evaluation was not carried out becuase the conversation log {conversation_log_filename} and the persona log {agent_persona_filename} do not share the same timestamp")
+        return
+    
+    conversation_log_basename = conversation_log_filename.replace(f"_{conversation_timestamp}.txt", "")
+    persona_log_basename = agent_persona_filename.replace(f"_{persona_timestamp}.txt", "")
+
+    evaluation_filename = f"{persona_log_basename}_evaluation_{conversation_log_basename}_{conversation_timestamp}.txt"
+
+    with open(os.path.join(CONVERSATION_LOG_DIR_NAME, conversation_log_filename), "r", encoding="utf-8") as file:
+        conversation_log_text = file.read()
+
+    with open(os.path.join(PERSONAS_LOG_DIR_NAME, agent_persona_filename), "r", encoding="utf-8") as file:
+        agent_persona_text = file.read()
+
+    evaluation_prompt = construct_evaluation_prompt(conversation_log_text, agent_persona_text)
+
+    evaluation_result = prompt_llm_for_structured_response(model_name, categorical_evaluation_schema, evaluation_prompt)
+
+    file_path = os.path.join(EVAL_RESULTS_DIR_NAME, evaluation_filename)
+    os.makedirs(EVAL_RESULTS_DIR_NAME, exist_ok=True)
+    with open(file_path, "w") as file:
+        file.write(evaluation_result) 
