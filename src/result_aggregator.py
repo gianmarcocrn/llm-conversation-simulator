@@ -66,7 +66,7 @@ for i, category in enumerate(rating_options):
     counts = [rating_counts_per_category[category][rating] for rating in ratings]
 
     # Plot bars
-    bars = ax.bar(ratings, counts, color='skyblue')
+    bars = ax.bar(ratings, counts, color='blue')
 
     # Add mean score as text inside the plot
     ax.text(0.95, 0.90, f"Mean Score: {mean_scores[category]:.2f}",

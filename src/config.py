@@ -2,6 +2,7 @@ CONVERSATION_LOG_FILE_NAME = "conversation_log_new_personas"
 CONVERSATION_LOG_DIR_NAME = "experiment_logs"
 PERSONAS_LOG_DIR_NAME = "experiment_personas"
 EVAL_RESULTS_DIR_NAME = "experiment_evaluation_logs"
+EVAL_TO_PLOT = "experiment_evaluation_logs"
 RUN_EVALUATION_ON_SAME_MODEL_AS_GENERATION = False # Advised to keep as False to avoid model bias in evaluation
 
 IS_AUTOMATIC_PERSONA_GENERATION = True # If False, below persona characteristics are used
