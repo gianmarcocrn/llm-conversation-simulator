@@ -22,6 +22,8 @@ In order to edit the configuration of the simulator, head to the config.py file.
   - Whether the conversation topic should be chosen at random from the IBM Project Debater dataset (If set to false, a conversation topic can be defined like the example one provided in the config file)
   - Whether the number of turns of the generated conversations should be fixed or variable
   - The number of fixed or minimum and maximum conversation turns (for variable)
+    
+A new conversation topic dataset could be used just changing all references to the IBM Project Debater dataset to the new dataset. The dataset should only include comma separated conversation topics.
 
 ## Running the Conversation Simulator
 In order to run the conversation simulator the following scripts from the scripts folder can be run:
