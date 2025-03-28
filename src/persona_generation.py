@@ -68,6 +68,7 @@ def convert_persona_demographic_dict_to_string(persona_characteristics : dict):
     """
 
 def generate_persona_prompt_from_demographics(persona_characteristics : dict, other_persona_name):
+    # Based on AI Persona, Wang et al., adapted for current needs
     return f"""
             You will now play the role of a real human engaging in a multi-turn conversation with another real human, whose name is {other_persona_name}
             I will provide you with a list of persona characteristics. Please first understand the persona details and fully immerse yourself into this role.

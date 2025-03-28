@@ -6,9 +6,9 @@ from config import CONVERSATION_LOG_DIR_NAME, EVAL_RESULTS_DIR_NAME, PERSONAS_LO
 
 # definitions from literature
 metric_to_explanation_mapping = {
-    "consistency": "Determine whether the specified persona is consistent with the exhibited conversation style and content, and whether elements of the persona remain unchanged throughout the different turns in the conversation", # from building better AI agents Sun et al
-    "relevance": "Determine whether each conversation is relevant to the conversation topic and serves as a valid continuation of the previous conversation turns",
-    "naturalness": "Determine whether a response is like something a person would naturally say", #from towards a unified... zhong et al
+    "consistency": "Determine whether the specified persona is consistent with the exhibited conversation style and content, and whether elements of the persona remain unchanged throughout the different turns in the conversation", # adapted from building better AI agents, Sun et al
+    "relevance": "Determine whether each conversation is relevant to the conversation topic and serves as a valid continuation of the previous conversation turns", # adapted from towards a unified..., zhong et al
+    "naturalness": "Determine whether a response is like something a person would naturally say", # adapted from towards a unified..., zhong et al
     "fluency": "Determine whether the conversation exhibits fluent language in the language that is correct for the context"
 }
 
@@ -91,7 +91,7 @@ def format_categories(metric):
     return formatted_string
 
 def construct_evaluation_prompt(conversation_history, agent_prompt):
-# based on g-eval, modified for current needs
+# based on g-eval, Liu et al., modified for current needs
     return f"""
 You will be given a conversation log between two AI agents. Each agent was assigned a persona specification and a common conversation topic to discuss.
 You will also be given the persona specification of one of the two agents.
