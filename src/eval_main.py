@@ -1,7 +1,6 @@
 import argparse, os
 
 from llm_judge_evaluator import run_evaluation_from_file_names
-from config import PERSONAS_LOG_DIR_NAME
 
 parser = argparse.ArgumentParser(description="Run a conversational data evaluator with a specified LLM")
 parser.add_argument("model_identifier", type=str, help="The LMStudio identifier of the LLM model to use.")
