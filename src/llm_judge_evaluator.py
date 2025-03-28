@@ -6,8 +6,8 @@ from config import CONVERSATION_LOG_DIR_NAME, EVAL_RESULTS_DIR_NAME, PERSONAS_LO
 
 # definitions from literature
 metric_to_explanation_mapping = {
-    "consistency": "Determine whether the specified persona is consistent with the exhibited conversation style and content, and wether elements of the persona remain unchanged throughout the different turns in the conversation", # from building better AI agents Sun et al
-    "relevance": "Determine whether each conversation is relevant to the conversation topic and serves as a valid continuation of the previous conversation turns", # or coherence?
+    "consistency": "Determine whether the specified persona is consistent with the exhibited conversation style and content, and whether elements of the persona remain unchanged throughout the different turns in the conversation", # from building better AI agents Sun et al
+    "relevance": "Determine whether each conversation is relevant to the conversation topic and serves as a valid continuation of the previous conversation turns",
     "naturalness": "Determine whether a response is like something a person would naturally say", #from towards a unified... zhong et al
     "fluency": "Determine whether the conversation exhibits fluent language in the language that is correct for the context"
 }
